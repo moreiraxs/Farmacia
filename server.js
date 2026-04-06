@@ -9,7 +9,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const qrcode = require('qrcode');
 const mongoose = require('mongoose');
 
-const Product = require('./models/Product');
+const Product = require('./models/Product.js');
 const Cart = require('./models/Cart');
 
 const app = express();
