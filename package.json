@@ -2,10 +2,13 @@
   "name": "farmacia",
   "version": "1.0.0",
   "description": "Site institucional e e-commerce de farmácia construído com HTML, CSS e JavaScript puro, seguindo os princípios de **Arquitetura Limpa** (Clean Architecture).",
-  "main": "index.js",
+  "main": "server.js",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "keywords": [],
   "author": "",

@@ -14,6 +14,21 @@ const Cart = require('./models/Cart');
 
 const app = express();
 
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/src', express.static(path.join(__dirname, 'src')));
+
+// Security middleware
+app.use(helmet());
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+
+// API Routes
+
 // Conectar ao MongoDB e iniciar o servidor apenas após a conexão
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
@@ -30,19 +45,6 @@ mongoose.connect(process.env.MONGO_URI)
       ]);
       console.log('Produtos iniciais inseridos');
     }
-
-    app.use(cors());
-    app.use(express.json());
-    app.use(express.static(path.join(__dirname, 'public')));
-    app.use('/src', express.static(path.join(__dirname, 'src')));
-
-    // Security middleware
-    app.use(helmet());
-    const limiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100, // limit each IP to 100 requests per windowMs
-    });
-    app.use(limiter);
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
