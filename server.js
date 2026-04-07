@@ -10,7 +10,7 @@ const qrcode = require('qrcode');
 const mongoose = require('mongoose');
 
 const Product = require('./models/Product.js');
-const Cart = require('./models/Cart');
+const Cart = require('./models/Cart.js');
 
 const app = express();
 
@@ -139,4 +139,5 @@ app.post('/api/payment', [
     console.error(err);
     res.status(500).json({ message: 'Erro ao criar link de pagamento' });
   }
+
 });
