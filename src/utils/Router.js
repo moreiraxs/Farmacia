@@ -1,20 +1,16 @@
-// ============================================
-//  FARMAVIDA — Router (Hash-based SPA Router)
-// ============================================
-
 import { renderHomePage }           from '../pages/Home.js';
-import { renderProductsPage }      from '../pages/Products.js';
-import { renderProductDetailPage } from '../pages/ProductDetail.js';
-import { renderContactPage }       from '../pages/Contact.js';
-import { renderPaymentPage }       from '../pages/Payment.js';
-import { renderCartPage }          from '../pages/Cart.js';
+import { renderProductsPage }       from '../pages/Products.js';
+import { renderProductDetailPage }  from '../pages/ProductDetail.js';
+import { renderContactPage }        from '../pages/Contact.js';
+import { renderPaymentPage }        from '../pages/Payment.js';
+import { renderCartPage }           from '../pages/Cart.js';
 
 const routes = {
-  '/'              : renderHomePage,
-  '/produtos'      : renderProductsPage,
-  '/contato'       : renderContactPage,
-  '/pagamento'     : renderPaymentPage,
-  '/carrinho'      : renderCartPage,
+  '/'         : renderHomePage,
+  '/produtos' : renderProductsPage,
+  '/contato'  : renderContactPage,
+  '/pagamento': renderPaymentPage,
+  '/carrinho' : renderCartPage,
 };
 
 export const Router = {
@@ -24,22 +20,22 @@ export const Router = {
     window.addEventListener('hashchange', () => this.navigate());
   },
 
-  navigate() {
+  async navigate() {
     const hash = window.location.hash.replace('#', '') || '/';
-    const [path, ...params] = hash.split('/');
-    const fullPath = path + (params[0] ? '/' + params[0] : '');
-    
-    // Verificar rotas dinâmicas (ex: /produto/p001)
-    if (path === '' && params[0] === 'produto' && params[1]) {
-      this.outlet.innerHTML = '';
-      renderProductDetailPage(this.outlet, params[1]);
+    const parts = hash.split('/').filter(Boolean);
+
+    this.outlet.innerHTML = '';
+
+    // Rota dinâmica: #/produto/p001
+    if (parts[0] === 'produto' && parts[1]) {
+      await renderProductDetailPage(this.outlet, parts[1]);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    
-    const handler = routes[fullPath] ?? routes[path] ?? routes['/'];
-    this.outlet.innerHTML = '';
-    handler(this.outlet);
+
+    const path    = '/' + (parts[0] || '');
+    const handler = routes[path] ?? routes['/'];
+    await handler(this.outlet);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 };

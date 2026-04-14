@@ -2,14 +2,18 @@
 //  FARMAVIDA — Payment Page
 // ============================================
 
-import { CartService } from '../services/CartService.js';
+import { CartService }    from '../services/CartService.js';
 import { ProductService } from '../services/ProductService.js';
 
-export function renderPaymentPage(container) {
-  // Calcular total do carrinho
+export async function renderPaymentPage(container) {
   const items = CartService.getItems();
+
+  // Busca os produtos do banco para calcular o total corretamente
+  const allProducts = await ProductService.getAll();
+  const findProduct = (id) => allProducts.find(p => p.productId === id) ?? null;
+
   const total = items.reduce((sum, item) => {
-    const product = ProductService.getById(item.id);
+    const product = findProduct(item.id);
     return product ? sum + product.price * item.qty : sum;
   }, 0);
 
@@ -42,10 +46,6 @@ export function renderPaymentPage(container) {
             </div>
 
             <form id="payment-form" class="payment-form">
-              <div class="form-group">
-                <label for="amount">Valor a Pagar (R$)</label>
-                <input type="number" id="amount" step="0.01" value="${total.toFixed(2)}" min="0.01" required>
-              </div>
               <button type="submit" class="btn btn-primary btn-lg">Gerar QR Code de Pagamento</button>
             </form>
           </div>
@@ -63,16 +63,16 @@ export function renderPaymentPage(container) {
     </section>
   `;
 
-  const form = container.querySelector('#payment-form');
-  const qrSection = container.querySelector('#qr-code-section');
-  const qrImg = container.querySelector('#qr-code');
-  const link = container.querySelector('#payment-link');
+  const form       = container.querySelector('#payment-form');
+  const qrSection  = container.querySelector('#qr-code-section');
+  const qrImg      = container.querySelector('#qr-code');
+  const link       = container.querySelector('#payment-link');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const amount = parseFloat(container.querySelector('#amount').value);
-    if (isNaN(amount) || amount <= 0) {
-      alert('Valor inválido');
+
+    if (items.length === 0) {
+      alert('Carrinho vazio');
       return;
     }
 
@@ -80,7 +80,7 @@ export function renderPaymentPage(container) {
       const response = await fetch('/api/payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ cartItems: items }),
       });
       const data = await response.json();
       if (response.ok) {

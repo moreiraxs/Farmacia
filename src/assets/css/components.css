@@ -710,6 +710,7 @@
 /* ─── Product Card Actions ───────────────────── */
 .product-card-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--space-sm);
   align-items: center;
   margin-top: var(--space-md);
@@ -728,6 +729,13 @@
   border-radius: var(--radius-md);
   text-align: center;
   font-weight: 600;
+}
+
+.product-card-qty-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 @media (max-width: 1024px) {
@@ -755,7 +763,7 @@
   }
 }
 
-}
+
 
 /* ─── Payment Page ───────────────────────────── */
 .payment-header {
@@ -1253,4 +1261,17 @@
   .product-detail-info {
     padding: var(--space-lg);
   }
+}
+
+/* ── Imagem real do produto no card ── */
+.product-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-card-emoji {
+  font-size: 3.5rem;
+
 }

@@ -1,17 +1,7 @@
 // ============================================
 //  FARMAVIDA — ProductService
+//  Agora busca os dados do banco via API
 // ============================================
-
-const PRODUCTS = [
-  { id: 'p001', name: 'Vitamina C 1000mg', category: 'Vitaminas', price: 29.90, priceOld: 39.90, emoji: '🍊', badge: 'Promo', badgeType: 'promo' },
-  { id: 'p002', name: 'Dipirona 500mg 20cp', category: 'Analgésicos', price: 8.50, emoji: '💊' },
-  { id: 'p003', name: 'Protetor Solar FPS 70', category: 'Dermocosméticos', price: 54.90, emoji: '🌞', badge: 'Novo', badgeType: 'new' },
-  { id: 'p004', name: 'Whey Protein 1kg', category: 'Suplementos', price: 119.90, priceOld: 149.90, emoji: '💪', badge: 'Promo', badgeType: 'promo' },
-  { id: 'p005', name: 'Ibuprofeno 600mg', category: 'Anti-inflamatórios', price: 12.00, emoji: '💊' },
-  { id: 'p006', name: 'Colágeno Hidrolisado', category: 'Vitaminas', price: 44.90, emoji: '✨', badge: 'Novo', badgeType: 'new' },
-  { id: 'p007', name: 'Shampoo Anticaspa', category: 'Higiene', price: 22.50, emoji: '🧴' },
-  { id: 'p008', name: 'Termômetro Digital', category: 'Equipamentos', price: 35.00, emoji: '🌡️' },
-];
 
 const CATEGORIES = [
   { slug: 'medicamentos',    name: 'Medicamentos',    icon: '💊' },
@@ -25,15 +15,45 @@ const CATEGORIES = [
 ];
 
 export const ProductService = {
-  getAll()           { return PRODUCTS; },
-  getFeatured()      { return PRODUCTS.slice(0, 8); },
-  getById(id)        { return PRODUCTS.find(p => p.id === id) ?? null; },
-  getCategories()    { return CATEGORIES; },
-  getByCategory(slug){ return PRODUCTS.filter(p => p.category.toLowerCase().includes(slug)); },
-  search(query)      {
+
+  // Busca TODOS os produtos do banco
+  async getAll() {
+    const res = await fetch('/api/products');
+    if (!res.ok) throw new Error('Erro ao buscar produtos');
+    return res.json();
+  },
+
+  // Busca os primeiros 8 produtos para a home
+  async getFeatured() {
+    const products = await this.getAll();
+    return products.slice(0, 8);
+  },
+
+  // Busca UM produto pelo productId (ex: 'p001')
+  async getById(id) {
+    const res = await fetch(`/api/products/${id}`);
+    if (!res.ok) return null;
+    return res.json();
+  },
+
+  // Categorias continuam locais (raramente mudam)
+  getCategories() {
+    return CATEGORIES;
+  },
+
+  // Filtra por categoria
+  async getByCategory(slug) {
+    const products = await this.getAll();
+    return products.filter(p => (p.category || '').toLowerCase().includes(slug));
+  },
+
+  // Busca por nome
+  async search(query) {
     const q = query.toLowerCase();
-    return PRODUCTS.filter(p =>
-      p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
+    const products = await this.getAll();
+    return products.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (p.category || '').toLowerCase().includes(q)
     );
   },
 };

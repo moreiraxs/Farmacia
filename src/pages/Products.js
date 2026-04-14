@@ -1,14 +1,7 @@
-// ============================================
-//  FARMAVIDA — Products Page
-// ============================================
-
 import { ProductCard }    from '../components/ProductCard.js';
 import { ProductService } from '../services/ProductService.js';
-import { CartService }    from '../services/CartService.js';
 
-export function renderProductsPage(container) {
-  const products = ProductService.getAll();
-
+export async function renderProductsPage(container) {
   container.innerHTML = `
     <section class="section">
       <div class="container">
@@ -17,16 +10,23 @@ export function renderProductsPage(container) {
           <h2 class="section-title">Todos os Produtos</h2>
           <p class="section-desc">Encontre tudo o que precisa para sua saúde e bem-estar.</p>
         </div>
-
-        <div class="products-grid" id="all-products-grid"></div>
+        <div class="products-grid" id="all-products-grid">
+          <p>Carregando produtos...</p>
+        </div>
       </div>
     </section>
   `;
 
   const grid = container.querySelector('#all-products-grid');
-  products.forEach(product => {
-    const card = document.createElement('div');
-    card.innerHTML = ProductCard(product);
-    grid.appendChild(card.firstElementChild);
-  });
+  try {
+    const products = await ProductService.getAll();
+    grid.innerHTML = '';
+    products.forEach(product => {
+      const card = document.createElement('div');
+      card.innerHTML = ProductCard(product);
+      grid.appendChild(card.firstElementChild);
+    });
+  } catch (err) {
+    grid.innerHTML = '<p>Erro ao carregar produtos.</p>';
+  }
 }
